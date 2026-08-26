@@ -1,0 +1,28 @@
+# Firmware images and card backups are NEVER committed.
+#
+# Vendor images are copyrighted redistribution. Card dumps carry personal save
+# data. Both are large enough to poison a git history permanently. The image
+# store lives outside this repository and is addressed by SHA-256 from
+# devices/*/firmware.yaml — see README, "The binary boundary".
+*.img
+*.img.gz
+*.img.xz
+*.img.zst
+*.iso
+*.7z
+*.zip
+store/
+backups/
+
+# Instance data. This repository is public; agent session logs, neural pattern
+# caches and policy state describe one machine's private working history and
+# must never be published from here.
+.claude-flow/
+.swarm/
+.agentic-qe/
+*.rvf
+*.rvf.*
+.claude/settings.local.json
+
+# macOS
+.DS_Store

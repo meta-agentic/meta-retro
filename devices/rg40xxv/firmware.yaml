@@ -1,0 +1,182 @@
+# Firmware catalogue — Anbernic RG40XX V (Allwinner H700)
+#
+# One entry per known image, stock or alternative.
+#
+#   sha256      null until the file has been hashed locally at least once.
+#               The vendor publishes no checksums, so for stock images this is a
+#               pin recorded on acquisition, NOT a verification against Anbernic.
+#   flashable   direct  — dd and Balena Etcher consume it as-is, no scratch space
+#               extract — must be expanded to a full-size .img first
+#   retrieved   date the file was fetched and hashed, or null if not held locally
+#
+# Files themselves live in the store outside this repository ($META_RETRO_STORE),
+# addressed by `filename`. Never commit an image here.
+
+device: rg40xxv
+model: Anbernic RG40XX V
+soc: Allwinner H700
+card_bytes: 62534975488
+
+images:
+
+  # ---- alternative firmware -------------------------------------------------
+
+  - id: knulli-scarab-20260511
+    kind: alternative
+    distribution: Knulli
+    target: rg40xx-v
+    version: scarab-20260511
+    filename: knulli-h700-rg40xx-v-scarab-20260511.img.gz
+    size_bytes: 1975565639
+    sha256: 92a45d362588ec72f443db9d8ec9dcc509e3b91e0b44bbb900651a3c7a12f0b3
+    flashable: direct
+    retrieved: 2026-08-08
+    held_locally: true
+    notes: >-
+      Ships as .img.gz, so it restores with no intermediate extraction and no
+      scratch space. Hash computed locally on 2026-08-24.
+
+  # ---- vendor stock ---------------------------------------------------------
+  #
+  # Every release is a 16 GB image; no 64 GB variant has ever been published.
+  # Flashing to the shipped 64 GB card leaves ~46 GB unallocated.
+  #
+  # Releases before V1.0.8 are on WeTransfer and have almost certainly expired.
+  # They are listed so the extent of the loss is a recorded fact rather than an
+  # assumption; reachability is unconfirmed until checked.
+
+  - id: anbernic-v1.1.1.0
+    kind: stock
+    distribution: Anbernic
+    version: V1.1.1.0-EN16GB-260521
+    released: 2026-05-21
+    variant: 16GB
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract       # .7z inside .zip -> 16 GB .img
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: google-drive
+
+  - id: anbernic-v1.1.0
+    kind: stock
+    distribution: Anbernic
+    version: V1.1.0-251225
+    released: 2025-12-25
+    variant: 16GB
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: google-drive
+
+  - id: anbernic-v1.0.9
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.9-251206
+    released: 2025-12-06
+    variant: 16GB
+    source: https://win.anbernic.com/download_data/647.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: google-drive
+
+  - id: anbernic-v1.0.8
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.8-250915
+    released: 2025-09-15
+    variant: 16GB
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: google-drive
+
+  - id: anbernic-v1.0.6
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.6-250211
+    released: 2025-02-11
+    variant: [16GB, 32GB]
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
+
+  - id: anbernic-v1.0.5
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.5-241223
+    released: 2024-12-23
+    variant: [16GB, 32GB]
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
+
+  - id: anbernic-v1.0.4
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.4-241018
+    released: 2024-10-18
+    variant: 16GB
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
+
+  - id: anbernic-v1.0.3
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.3-240923
+    released: 2024-09-23
+    variant: 16GB
+    source: https://win.anbernic.com/download/448.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
+
+  - id: anbernic-v1.0.2
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.2-EN-240901
+    released: 2024-09-01
+    variant: 16GB
+    source: https://win.anbernic.com/download_data/463.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
+
+  - id: anbernic-v1.0.1
+    kind: stock
+    distribution: Anbernic
+    version: V1.0.1-EN-240809
+    released: 2024-08-09
+    variant: 16GB
+    source: https://win.anbernic.com/download_data/449.html
+    flashable: extract
+    sha256: null
+    retrieved: null
+    held_locally: false
+    host: wetransfer
+    reachable: unconfirmed
