@@ -36,9 +36,12 @@ def size_arg(text):
     t = text.strip().upper().removesuffix("IB").removesuffix("B")
     unit = t[-1] if t and t[-1] in UNITS else ""
     try:
-        return int(float(t[: len(t) - len(unit)]) * UNITS[unit])
+        n = int(float(t[: len(t) - len(unit)]) * UNITS[unit])
     except ValueError:
         raise argparse.ArgumentTypeError(f"not a size: {text!r} (e.g. 62534975488, 10G, 512M)")
+    if n <= 0:
+        raise argparse.ArgumentTypeError(f"size must be positive: {text!r}")
+    return n
 
 
 def human(n):
@@ -123,17 +126,35 @@ class Progress:
             print(self.line(), file=sys.stderr, flush=True)
 
 
-def on_sigterm(*_):
+STOP_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+
+
+def ignore_stop_signals():
+    for sig in STOP_SIGNALS:
+        signal.signal(sig, signal.SIG_IGN)
+
+
+def on_stop_signal(*_):
+    # Ignore repeats before raising, so a second signal cannot interrupt cleanup.
+    ignore_stop_signals()
     raise KeyboardInterrupt
 
 
-def dump(src_fd,out, expect, floor, chunk_delay):
+def install_stop_handlers():
+    for sig in STOP_SIGNALS:
+        if signal.getsignal(sig) is not signal.SIG_IGN:  # keep nohup and background-job semantics
+            signal.signal(sig, on_stop_signal)
+
+
+def dump(src_fd, out, expect, floor, chunk_delay):
     partial = out + ".partial"
     h = hashlib.sha256()
     prog = Progress(expect)
     signal.signal(signal.SIGINFO, lambda *_: print(prog.line(), file=sys.stderr, flush=True))
-    fd = os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    sidecar = out + ".sha256"
+    fd = None
     try:
+        fd = os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         since_sync = 0
         while prog.pos < expect:
             data = os.pread(src_fd, min(CHUNK, expect - prog.pos), prog.pos)
@@ -148,7 +169,8 @@ def dump(src_fd,out, expect, floor, chunk_delay):
             if since_sync >= FSYNC_EVERY:
                 os.fsync(fd)
                 since_sync = 0
-            free = free_bytes(os.path.dirname(partial))
+            # Unsynced bytes may not be allocated yet, so count them as already spent.
+            free = free_bytes(os.path.dirname(partial)) - since_sync
             if free < floor:
                 raise Abort(f"free space {human(free)} crossed the floor of {human(floor)} "
                             f"at {human(prog.pos)} of {human(expect)}")
@@ -161,16 +183,25 @@ def dump(src_fd,out, expect, floor, chunk_delay):
         if os.path.getsize(partial) != expect:
             raise Abort(f"image is {os.path.getsize(partial)} bytes on disk, expected {expect}")
         os.rename(partial, out)
+        digest = h.hexdigest()
+        with open(sidecar, "x") as f:
+            f.write(f"{digest}  {os.path.basename(out)}\n")
     except BaseException as e:
+        ignore_stop_signals()
         if fd is not None:
             os.close(fd)
-        os.unlink(partial)
+        # Fail closed: an image without its checksum is not a backup either.
+        for path in (partial, out, sidecar):
+            try:
+                os.unlink(path)
+            except FileNotFoundError:
+                pass
         reason = e if isinstance(e, Abort) else (
             "interrupted" if isinstance(e, KeyboardInterrupt) else f"{type(e).__name__}: {e}")
         print(f"ABORTED   {reason}\n          partial image removed: {partial}", file=sys.stderr)
         sys.exit(EXIT_ABORTED)
     print(prog.line(), file=sys.stderr)
-    return h.hexdigest()
+    return digest
 
 
 def main():
@@ -186,19 +217,26 @@ def main():
     p.add_argument("--allow-file-source", action="store_true", help="accept a regular file as source")
     a = p.parse_args(sys.argv[1:])
 
+    if a.floor < CHUNK:
+        refuse(f"--floor must be at least {human(CHUNK)} (one write chunk), or a write could hit ENOSPC.")
     out = os.path.abspath(a.output)
-    if os.path.lexists(out) or os.path.lexists(out + ".partial"):
-        refuse(f"{out} (or its .partial) already exists — will not overwrite.")
+    if any(os.path.lexists(out + ext) for ext in ("", ".partial", ".sha256")):
+        refuse(f"{out} (or its .partial/.sha256) already exists — will not overwrite.")
     if not os.path.isdir(os.path.dirname(out)):
         refuse(f"output directory {os.path.dirname(out)} does not exist.")
 
-    label, disk = identify(a.source, a.expect_bytes, a.allow_file_source)
-    print(f"source    {a.source} ({label}), {a.expect_bytes} bytes — matches expected")
-
+    # Open first, then identify and confirm the path still names the opened node.
     try:
-        src_fd = os.open(a.source, os.O_RDONLY)
+        src_fd, open_err = os.open(a.source, os.O_RDONLY), None
     except OSError as e:
-        refuse(f"cannot open {a.source} for reading: {e.strerror} (raw disk reads need sudo)")
+        src_fd, open_err = None, e
+    label, disk = identify(a.source, a.expect_bytes, a.allow_file_source)
+    if open_err:
+        refuse(f"cannot open {a.source} for reading: {open_err.strerror} (raw disk reads need sudo)")
+    opened, named = os.fstat(src_fd), os.stat(a.source)
+    if (opened.st_dev, opened.st_ino, opened.st_rdev) != (named.st_dev, named.st_ino, named.st_rdev):
+        refuse(f"{a.source} changed while it was being identified.")
+    print(f"source    {a.source} ({label}), {a.expect_bytes} bytes — matches expected")
 
     raw, packed, read_s, n = sample(src_fd, a.expect_bytes, a.sample)
     rate = raw / read_s if read_s > 0 else float("inf")
@@ -218,14 +256,12 @@ def main():
         return
     if disk:
         print(f"monitor   iostat -Id {disk} 10    (cumulative device reads, from another terminal)")
-    signal.signal(signal.SIGTERM, on_sigterm)
-    signal.signal(signal.SIGHUP, on_sigterm)
+    install_stop_handlers()
 
     # Test-only: slows each chunk so tests can change free space mid-run on a real volume.
     delay = float(os.environ.get("META_RETRO_DUMP_CHUNK_DELAY", "0") or 0)
     digest = dump(src_fd, out, a.expect_bytes, a.floor, delay)
-    with open(out + ".sha256", "w") as f:
-        f.write(f"{digest}  {os.path.basename(out)}\n")
+    ignore_stop_signals()
     print(f"sha256    {digest}")
     print(f"done      {out}\n          verify: (cd {os.path.dirname(out)} && shasum -a 256 -c {os.path.basename(out)}.sha256)")
 

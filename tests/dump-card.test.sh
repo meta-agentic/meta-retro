@@ -65,6 +65,18 @@ expect_exit "refuses when byte count differs from expected" 3 $?
 expect_exit "refuses an internal disk" 3 $?
 grep -q "not an external device" "$WORK/err" || bad "internal-disk refusal names the reason"
 
+DEST_SLICE="$(df "$DEST" | awk 'NR==2{print $1}')"
+"$DUMP" --source "/dev/r${DEST_SLICE#/dev/}" --expect-bytes 1 --output "$WORK/p.img" >/dev/null 2>"$WORK/err"
+expect_exit "refuses a partition ($DEST_SLICE)" 3 $?
+check "partition refusal names the reason" grep -q "is a partition" "$WORK/err"
+
+# --- argument validation -----------------------------------------------------
+
+"$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor -5G --output "$DEST/a.img" >/dev/null 2>"$WORK/err"
+expect_exit "rejects a negative floor" 2 $?
+"$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor 1M --output "$DEST/a.img" >/dev/null 2>"$WORK/err"
+expect_exit "rejects a floor smaller than one write chunk" 3 $?
+
 # --- abort before write: projection exceeds free space ----------------------
 
 "$DUMP" --source "$SRC48" --expect-bytes $((48 * MiB)) --floor 32M --output "$DEST/big.img" >"$WORK/out" 2>"$WORK/err"
@@ -108,16 +120,48 @@ check "no image left under the final name" [ ! -e "$DEST/mid.img" ]
 check "destination still above the floor after abort" [ "$(free_bytes "$DEST")" -ge $((8 * MiB)) ]
 rm -f "$DEST/filler"
 
-# --- interrupted run cleans up too -------------------------------------------
+# --- interrupted runs clean up too ------------------------------------------
 
-META_RETRO_DUMP_CHUNK_DELAY=0.25 \
-  "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor 8M --output "$DEST/int.img" >/dev/null 2>"$WORK/err" &
-pid=$!
-for _ in $(seq 1 200); do [ -e "$DEST/int.img.partial" ] && break; sleep 0.02; done
+start_slow_dump() { # name -> sets pid once the .partial exists
+  META_RETRO_DUMP_CHUNK_DELAY=0.2 \
+    "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor 8M --output "$DEST/$1.img" >/dev/null 2>"$WORK/err" &
+  pid=$!
+  for _ in $(seq 1 200); do [ -e "$DEST/$1.img.partial" ] && break; sleep 0.02; done
+}
+no_leftovers() { [ ! -e "$DEST/$1.img.partial" ] && [ ! -e "$DEST/$1.img" ] && [ ! -e "$DEST/$1.img.sha256" ]; }
+
+start_slow_dump int
 kill -TERM "$pid"
 wait "$pid"
 expect_exit "SIGTERM mid-run aborts" 4 $?
-check "interrupted run leaves no partial image" [ ! -e "$DEST/int.img.partial" ]
+check "interrupted run leaves no partial image" no_leftovers int
+
+# A second signal must not interrupt the cleanup the first one started.
+orphaned=0
+for i in 1 2 3 4 5; do
+  start_slow_dump "dbl$i"
+  kill -TERM "$pid"; kill -TERM "$pid"
+  wait "$pid"
+  no_leftovers "dbl$i" || orphaned=$((orphaned + 1))
+done
+check "double SIGTERM leaves nothing behind (5 runs, $orphaned orphaned)" [ "$orphaned" -eq 0 ]
+
+start_slow_dump hupterm
+kill -HUP "$pid"; kill -TERM "$pid"; kill -HUP "$pid"
+wait "$pid"
+expect_exit "SIGHUP then SIGTERM aborts once" 4 $?
+check "SIGHUP then SIGTERM leaves nothing behind" no_leftovers hupterm
+
+# Under nohup (SIGHUP ignored on entry) a hangup must not stop the dump.
+(trap '' HUP; META_RETRO_DUMP_CHUNK_DELAY=0.2 exec "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) \
+  --floor 8M --output "$DEST/nohup.img" >/dev/null 2>"$WORK/err") &
+pid=$!
+for _ in $(seq 1 200); do [ -e "$DEST/nohup.img.partial" ] && break; sleep 0.02; done
+kill -HUP "$pid"
+wait "$pid"
+expect_exit "ignored SIGHUP (nohup) does not stop the dump" 0 $?
+check "dump under nohup completed with its checksum" [ -e "$DEST/nohup.img.sha256" ]
+rm -f "$DEST/nohup.img" "$DEST/nohup.img.sha256"
 
 echo
 echo "$pass passed, $fail failed"
