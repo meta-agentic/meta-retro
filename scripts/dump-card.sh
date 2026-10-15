@@ -195,14 +195,17 @@ def dump(src_fd, out, expect, floor, chunk_delay):
         if fd is not None:
             os.close(fd)
         # Fail closed: an image without its checksum is not a backup either.
+        removed = []
         for path in created:
             try:
                 os.unlink(path)
+                removed.append(path)
             except FileNotFoundError:
                 pass
         reason = e if isinstance(e, Abort) else (
             "interrupted" if isinstance(e, KeyboardInterrupt) else f"{type(e).__name__}: {e}")
-        print(f"ABORTED   {reason}\n          partial image removed: {partial}", file=sys.stderr)
+        cleaned = "removed: " + ", ".join(removed) if removed else "nothing written by this run to remove"
+        print(f"ABORTED   {reason}\n          {cleaned}", file=sys.stderr)
         sys.exit(EXIT_ABORTED)
     print(prog.line(), file=sys.stderr)
     return digest

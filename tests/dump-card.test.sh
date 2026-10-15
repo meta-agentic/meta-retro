@@ -155,16 +155,19 @@ check "SIGHUP then SIGTERM leaves nothing behind" no_leftovers hupterm
 # Two runs racing for the same --output: the loser must not delete the winner's dump.
 lost=0; raced=0
 for i in 1 2 3; do
-  race_run() { "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor 8M --output "$DEST/race$i.img" >/dev/null 2>&1; }
-  race_run & pid_a=$!
-  race_run & pid_b=$!
+  race_run() { "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) --floor 8M --output "$DEST/race$i.img" >/dev/null 2>"$WORK/race-$1.err"; }
+  race_run a & pid_a=$!
+  race_run b & pid_b=$!
   wait "$pid_a"; ea=$?; wait "$pid_b"; eb=$?
-  [ "$ea" -eq 4 ] || [ "$eb" -eq 4 ] && raced=$((raced + 1))
+  if [ "$ea" -eq 4 ] || [ "$eb" -eq 4 ]; then
+    raced=$((raced + 1))
+    grep -qh "nothing written by this run to remove" "$WORK/race-a.err" "$WORK/race-b.err" || lost=$((lost + 1))
+  fi
   if [ "$ea" -ne 0 ] && [ "$eb" -ne 0 ]; then lost=$((lost + 1)); fi
   (cd "$DEST" && shasum -a 256 -c "race$i.img.sha256" >/dev/null 2>&1) || lost=$((lost + 1))
   rm -f "$DEST/race$i.img" "$DEST/race$i.img.sha256"
 done
-check "same-output race keeps the winner's verified dump (3 runs, $raced reached the O_EXCL race)" [ "$lost" -eq 0 ]
+check "same-output race keeps the winner's verified dump, loser reports no removal (3 runs, $raced reached the O_EXCL race)" [ "$lost" -eq 0 ]
 
 # Under nohup (SIGHUP ignored on entry) a hangup must not stop the dump.
 (trap '' HUP; META_RETRO_DUMP_CHUNK_DELAY=0.2 exec "$DUMP" --source "$SRC24" --expect-bytes $((24 * MiB)) \
