@@ -68,12 +68,46 @@ the situation in which a restore tends to be needed.
 - A `.7z` inside a `.zip` must first be expanded to a full-size `.img`. Restoring a
   16 GB image therefore needs 16 GB free before it can begin.
 
+## Dumping a card
+
+`scripts/dump-card.sh` images a whole card to an uncompressed `.img` and refuses to
+start a dump it cannot finish:
+
+```sh
+sudo scripts/dump-card.sh --source /dev/rdisk5 --expect-bytes 62534975488 \
+    --output /Volumes/Backup/rg40xxv-2026-10-15.img
+```
+
+1. **Identity.** The source must be an external whole disk of exactly `--expect-bytes`.
+   Internal disks, partitions and size mismatches are refused, because device numbers
+   change across replugs.
+2. **Benchmark.** Samples spread across the card give the read rate and the projected
+   duration, so a slow USB port shows up before the run starts, not hours into it.
+3. **Ratio.** The same samples are gzipped to measure how well the card compresses. The
+   result is reported, not acted on: card residue measured at 1.058, so images are
+   written uncompressed and sized at the full card.
+4. **Preflight.** Refuses unless free space covers the image plus `--floor` (default
+   10G). Nothing is created on refusal.
+5. **Dump.** A single process reads, hashes and writes in one pass. Free space is
+   checked after every 4 MiB chunk, and the run aborts as soon as it drops below the
+   floor, without waiting for `ENOSPC`. On abort or interrupt the `.partial` file is
+   deleted, and an image only gets its final name once it is complete.
+6. **Checksum.** Writes `<image>.sha256` from the source stream; `shasum -a 256 -c`
+   verifies it without a second read of the card.
+
+`Ctrl-T` reports the dump's own progress, because no pipeline sits in between. For an
+external view, the tool prints the matching `iostat -Id diskN` command. Pass
+`--preflight-only` to compare USB ports without dumping.
+
+`tests/dump-card.test.sh` runs every refusal and abort path for real (no root, no
+mocks). It uses a raw disk image attached as an external device for the source and a
+64 MiB HFS+ volume for the destination. While a dump is running, a second writer fills
+that volume, so free space genuinely crosses the floor mid-run.
+
 ## Status
 
-The device profiles and the firmware catalogue are in place. The dump, verify and flash
-tooling is specified and tracked, and deliberately not yet published here: an earlier
-ad-hoc version lacked the compression preflight and free-space floor described above,
-and shipping it would propagate the exact failure this project exists to prevent.
+The device profiles, the firmware catalogue, the store verifier and the dump tool are
+in place. Flash tooling is specified and tracked, but not published here yet.
 
 ## Licence
 
