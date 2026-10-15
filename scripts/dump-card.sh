@@ -153,8 +153,10 @@ def dump(src_fd, out, expect, floor, chunk_delay):
     signal.signal(signal.SIGINFO, lambda *_: print(prog.line(), file=sys.stderr, flush=True))
     sidecar = out + ".sha256"
     fd = None
+    created = []  # only ever unlink what this process made: a concurrent run may own the rest
     try:
         fd = os.open(partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        created.append(partial)
         since_sync = 0
         while prog.pos < expect:
             data = os.pread(src_fd, min(CHUNK, expect - prog.pos), prog.pos)
@@ -183,15 +185,17 @@ def dump(src_fd, out, expect, floor, chunk_delay):
         if os.path.getsize(partial) != expect:
             raise Abort(f"image is {os.path.getsize(partial)} bytes on disk, expected {expect}")
         os.rename(partial, out)
+        created[created.index(partial)] = out
         digest = h.hexdigest()
         with open(sidecar, "x") as f:
+            created.append(sidecar)
             f.write(f"{digest}  {os.path.basename(out)}\n")
     except BaseException as e:
         ignore_stop_signals()
         if fd is not None:
             os.close(fd)
         # Fail closed: an image without its checksum is not a backup either.
-        for path in (partial, out, sidecar):
+        for path in created:
             try:
                 os.unlink(path)
             except FileNotFoundError:
