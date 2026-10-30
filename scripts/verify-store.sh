@@ -5,8 +5,12 @@
 # Store location is configuration, not content:
 #   META_RETRO_STORE=/path/to/images scripts/verify-store.sh rg40xxv
 #
-# Exit 0 only if every image marked held_locally verified. Missing hashes and
-# missing files are reported as blocking, never as passed.
+# Every catalogue entry gets a line: held entries are hashed, entries the store
+# does not hold are reported as NOT HELD (a known gap, not a failure). Exit 0
+# only if every image marked held_locally verified. Missing hashes and missing
+# files are reported as blocking, never as passed.
+#
+# META_RETRO_DEVICES overrides the devices/ directory (used by the tests).
 
 set -uo pipefail
 
@@ -14,7 +18,7 @@ DEVICE="${1:-}"
 [ -n "$DEVICE" ] || { echo "usage: $(basename "$0") <device>   (e.g. rg40xxv)" >&2; exit 2; }
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CATALOGUE="$ROOT/devices/$DEVICE/firmware.yaml"
+CATALOGUE="${META_RETRO_DEVICES:-$ROOT/devices}/$DEVICE/firmware.yaml"
 [ -f "$CATALOGUE" ] || { echo "no catalogue for device '$DEVICE' at devices/$DEVICE/firmware.yaml" >&2; exit 2; }
 
 STORE="${META_RETRO_STORE:-}"
@@ -35,9 +39,13 @@ def sha256(path):
     return h.hexdigest()
 
 held = [i for i in images if i.get("held_locally")]
-if not held:
-    print("no images marked held_locally — nothing to verify")
-    sys.exit(0)
+unheld = [i for i in images if not i.get("held_locally")]
+
+# Report what the store does not hold instead of skipping it silently.
+for img in unheld:
+    stray = os.path.exists(os.path.join(store, img["filename"])) if img.get("filename") else False
+    note = "present in store but not marked held_locally" if stray else "not held locally"
+    print(f"NOT HELD  {img['id']}: {note}")
 
 failed = 0
 for img in held:
@@ -64,6 +72,6 @@ for img in held:
         failed += 1
 
 print()
-print(f"{len(held) - failed}/{len(held)} verified")
+print(f"{len(held) - failed}/{len(held)} held verified, {len(unheld)} not held")
 sys.exit(1 if failed else 0)
 PY
