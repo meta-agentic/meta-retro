@@ -155,18 +155,13 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download/448.html
     flashable: extract
-    filename: stock/RG40XXV-V1.0.4-EN16GB-241018.zip
-    size_bytes: 2648369895
-    download_url: https://we.tl/t-VdATXXBzFh
-    sha256: 18a424da4370fc11bc7677cf0796fd66b2150ae003608f54bdc2cbf62946d9cb
-    retrieved: 2026-11-04
-    held_locally: true
+    sha256: null
+    retrieved: null
+    held_locally: false
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
-    notes: >-
-      The download was served as RG40XXV-V1.0.4-EN16GB-241018.zip, stored under that name. Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+    reachable_note: WeTransfer link reports the 16GB transfer downloadable; not fetched
 
   - id: anbernic-v1.0.3
     kind: stock
@@ -176,18 +171,13 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download/448.html
     flashable: extract
-    filename: stock/RG40XXV-V1.0.3-EN16GB-240923.zip
-    size_bytes: 3395196144
-    download_url: https://we.tl/t-VZSGVcKInr
-    sha256: 5ab523c007b85172db918b3a87833da08c3e21ed28087130c2bafae9a2ee5683
-    retrieved: 2026-11-04
-    held_locally: true
+    sha256: null
+    retrieved: null
+    held_locally: false
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
-    notes: >-
-      The download was served as cxm_rg40xxv-v1-0-3-en16gb-240923_2024-09-28_1409.zip; the stored name was normalised to the release name. Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+    reachable_note: WeTransfer link reports the 16GB transfer downloadable; not fetched
 
   - id: anbernic-v1.0.2
     kind: stock
@@ -197,18 +187,13 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download_data/463.html
     flashable: extract
-    filename: stock/RG40XXV-V1.0.2-EN16GB-240901.zip
-    size_bytes: 2757896369
-    download_url: https://we.tl/t-RnEjJMn6GA
-    sha256: cc3000860ab98ae76668c453ac7d4198cd0eab9ee2665800c6ba3dad50c156f5
-    retrieved: 2026-11-04
-    held_locally: true
+    sha256: null
+    retrieved: null
+    held_locally: false
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
-    notes: >-
-      The download was served as RG40XXV-V1.0.2-EN16GB-240901.zip, stored under that name. Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+    reachable_note: WeTransfer link reports the 16GB transfer downloadable; not fetched
 
   - id: anbernic-v1.0.1
     kind: stock
@@ -218,15 +203,10 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download_data/449.html
     flashable: extract
-    filename: stock/RG40XXV-V1.0.1-EN16GB-240809.zip
-    size_bytes: 2641634504
-    download_url: https://we.tl/t-9cPYL9B7PC
-    sha256: fa4298eb4518829955dd1b5fceff3e78c8a88e83c64a5797a7f8c81045c7ca80
-    retrieved: 2026-11-04
-    held_locally: true
+    sha256: null
+    retrieved: null
+    held_locally: false
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
-    notes: >-
-      The download was served as cxm_rg40xxv-v1-0-1-en16gb-240809_2024-08-19_0901.zip; the stored name was normalised to the release name. Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+    reachable_note: WeTransfer link reports the 16GB transfer downloadable; not fetched
