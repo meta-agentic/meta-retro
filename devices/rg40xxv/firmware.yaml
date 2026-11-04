@@ -41,9 +41,10 @@ images:
   # Every release is a 16 GB image; no 64 GB variant has ever been published.
   # Flashing to the shipped 64 GB card leaves ~46 GB unallocated.
   #
-  # Releases before V1.0.8 are on WeTransfer and have almost certainly expired.
-  # They are listed so the extent of the loss is a recorded fact rather than an
-  # assumption; reachability is unconfirmed until checked.
+  # `reachable` records whether the vendor link still resolves to a download
+  # (true/false), `reachable_checked` the date it was probed, and `reachable_note`
+  # what was observed. Reachable is not held: no stock image has been acquired
+  # yet, so every entry keeps sha256 null and held_locally false.
 
   - id: anbernic-v1.1.1.0
     kind: stock
@@ -57,6 +58,9 @@ images:
     retrieved: null
     held_locally: false
     host: google-drive
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: the Drive folder lists one archive; scripted download refused with Drive quota exceeded
 
   - id: anbernic-v1.1.0
     kind: stock
@@ -70,6 +74,9 @@ images:
     retrieved: null
     held_locally: false
     host: google-drive
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: the Drive folder lists one archive; not fetched
 
   - id: anbernic-v1.0.9
     kind: stock
@@ -83,6 +90,9 @@ images:
     retrieved: null
     held_locally: false
     host: google-drive
+    reachable: false
+    reachable_checked: 2026-11-04
+    reachable_note: the Drive folder returns HTTP 404
 
   - id: anbernic-v1.0.8
     kind: stock
@@ -96,6 +106,9 @@ images:
     retrieved: null
     held_locally: false
     host: google-drive
+    reachable: false
+    reachable_checked: 2026-11-04
+    reachable_note: the Drive folder returns HTTP 404
 
   - id: anbernic-v1.0.6
     kind: stock
@@ -109,7 +122,9 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: false
+    reachable_checked: 2026-11-04
+    reachable_note: both WeTransfer links report the transfer unavailable
 
   - id: anbernic-v1.0.5
     kind: stock
@@ -123,7 +138,9 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: false
+    reachable_checked: 2026-11-04
+    reachable_note: both WeTransfer links report the transfer unavailable
 
   - id: anbernic-v1.0.4
     kind: stock
@@ -137,7 +154,9 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.6 GB); not fetched
 
   - id: anbernic-v1.0.3
     kind: stock
@@ -151,7 +170,9 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 3.4 GB); not fetched
 
   - id: anbernic-v1.0.2
     kind: stock
@@ -165,7 +186,9 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.8 GB); not fetched
 
   - id: anbernic-v1.0.1
     kind: stock
@@ -179,4 +202,6 @@ images:
     retrieved: null
     held_locally: false
     host: wetransfer
-    reachable: unconfirmed
+    reachable: true
+    reachable_checked: 2026-11-04
+    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.6 GB); not fetched
