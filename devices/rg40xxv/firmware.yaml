@@ -43,8 +43,8 @@ images:
   #
   # `reachable` records whether the vendor link still resolves to a download
   # (true/false), `reachable_checked` the date it was probed, and `reachable_note`
-  # what was observed. Reachable is not held: no stock image has been acquired
-  # yet, so every entry keeps sha256 null and held_locally false.
+  # what was observed. Reachable is not held: an entry is held only once its
+  # file has been hashed. Hashes pin what was fetched; the vendor publishes none.
 
   - id: anbernic-v1.1.1.0
     kind: stock
@@ -54,13 +54,18 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download/448.html
     flashable: extract       # .7z inside .zip -> 16 GB .img
-    sha256: null
-    retrieved: null
-    held_locally: false
+    filename: RG40XXV-V1.1.1.0-EN16GB-260521.IMG.7z
+    size_bytes: 2456680409
+    download_url: https://drive.google.com/drive/folders/1OVjDih5QfxRxHaIzsIAjPPD2E4nK2bZ8
+    sha256: 691ed65ae565269a493d0b5e946639684c23cef4ee6580e060c8716d868e3d3e
+    retrieved: 2026-08-08
+    held_locally: true
     host: google-drive
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: the Drive folder lists one archive; scripted download refused with Drive quota exceeded
+    reachable_note: the Drive folder lists one archive; a scripted anonymous download is refused with Drive quota exceeded, so the held copy was fetched by hand
+    notes: >-
+      Archive as published (a bare .7z, not zipped). Hash computed 2026-11-04. Decompresses to a 15476981760-byte image with a GPT partition table of 7 partitions (Roms, boot-resource, env, boot, rootfs, appfs, UDISK).
 
   - id: anbernic-v1.1.0
     kind: stock
@@ -76,7 +81,7 @@ images:
     host: google-drive
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: the Drive folder lists one archive; not fetched
+    reachable_note: the Drive folder lists one archive; a scripted anonymous download is refused with Drive quota exceeded, not held
 
   - id: anbernic-v1.0.9
     kind: stock
@@ -150,13 +155,18 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download/448.html
     flashable: extract
-    sha256: null
-    retrieved: null
-    held_locally: false
+    filename: stock/RG40XXV-V1.0.4-EN16GB-241018.zip
+    size_bytes: 2648369895
+    download_url: https://we.tl/t-VdATXXBzFh
+    sha256: 18a424da4370fc11bc7677cf0796fd66b2150ae003608f54bdc2cbf62946d9cb
+    retrieved: 2026-11-04
+    held_locally: true
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.6 GB); not fetched
+    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
+    notes: >-
+      Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.3
     kind: stock
@@ -166,13 +176,18 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download/448.html
     flashable: extract
-    sha256: null
-    retrieved: null
-    held_locally: false
+    filename: stock/RG40XXV-V1.0.3-EN16GB-240923.zip
+    size_bytes: 3395196144
+    download_url: https://we.tl/t-VZSGVcKInr
+    sha256: 5ab523c007b85172db918b3a87833da08c3e21ed28087130c2bafae9a2ee5683
+    retrieved: 2026-11-04
+    held_locally: true
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 3.4 GB); not fetched
+    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
+    notes: >-
+      Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.2
     kind: stock
@@ -182,13 +197,18 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download_data/463.html
     flashable: extract
-    sha256: null
-    retrieved: null
-    held_locally: false
+    filename: stock/RG40XXV-V1.0.2-EN16GB-240901.zip
+    size_bytes: 2757896369
+    download_url: https://we.tl/t-RnEjJMn6GA
+    sha256: cc3000860ab98ae76668c453ac7d4198cd0eab9ee2665800c6ba3dad50c156f5
+    retrieved: 2026-11-04
+    held_locally: true
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.8 GB); not fetched
+    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
+    notes: >-
+      Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.1
     kind: stock
@@ -198,10 +218,15 @@ images:
     variant: 16GB
     source: https://win.anbernic.com/download_data/449.html
     flashable: extract
-    sha256: null
-    retrieved: null
-    held_locally: false
+    filename: stock/RG40XXV-V1.0.1-EN16GB-240809.zip
+    size_bytes: 2641634504
+    download_url: https://we.tl/t-9cPYL9B7PC
+    sha256: fa4298eb4518829955dd1b5fceff3e78c8a88e83c64a5797a7f8c81045c7ca80
+    retrieved: 2026-11-04
+    held_locally: true
     host: wetransfer
     reachable: true
     reachable_checked: 2026-11-04
-    reachable_note: WeTransfer reports the 16GB transfer downloadable (about 2.6 GB); not fetched
+    reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
+    notes: >-
+      Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
