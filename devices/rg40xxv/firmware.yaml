@@ -65,7 +65,7 @@ images:
     reachable_checked: 2026-11-04
     reachable_note: the Drive folder lists one archive; a scripted anonymous download is refused with Drive quota exceeded, so the held copy was fetched by hand
     notes: >-
-      Archive as published (a bare .7z, not zipped). Hash computed 2026-11-04. Decompresses to a 15476981760-byte image with a GPT partition table of 7 partitions (Roms, boot-resource, env, boot, rootfs, appfs, UDISK).
+      This file was not re-downloaded for the catalogue: it was hashed on 2026-11-04 from a copy already held, retrieved 2026-08-08, and nothing ties that copy to the vendor's current file beyond its matching name and contents. Archive is a bare .7z, not zipped. Decompresses to a 15476981760-byte image with a GPT partition table of 7 partitions (Roms, boot-resource, env, boot, rootfs, appfs, UDISK).
 
   - id: anbernic-v1.1.0
     kind: stock
@@ -166,7 +166,7 @@ images:
     reachable_checked: 2026-11-04
     reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
     notes: >-
-      Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+      The download was served as RG40XXV-V1.0.4-EN16GB-241018.zip, stored under that name. Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.3
     kind: stock
@@ -187,7 +187,7 @@ images:
     reachable_checked: 2026-11-04
     reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
     notes: >-
-      Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+      The download was served as cxm_rg40xxv-v1-0-3-en16gb-240923_2024-09-28_1409.zip; the stored name was normalised to the release name. Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.2
     kind: stock
@@ -208,7 +208,7 @@ images:
     reachable_checked: 2026-11-04
     reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
     notes: >-
-      Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+      The download was served as RG40XXV-V1.0.2-EN16GB-240901.zip, stored under that name. Archive as published by the vendor (a zip wrapping the .IMG.7z). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
 
   - id: anbernic-v1.0.1
     kind: stock
@@ -229,4 +229,4 @@ images:
     reachable_checked: 2026-11-04
     reachable_note: WeTransfer link still downloadable; fetched anonymously on 2026-11-04
     notes: >-
-      Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
+      The download was served as cxm_rg40xxv-v1-0-1-en16gb-240809_2024-08-19_0901.zip; the stored name was normalised to the release name. Archive as published by the vendor (a zip wrapping the .IMG.7z and a Rufus installer). The image inside decompresses to a GPT disk with the same seven partitions as the other releases (Roms, boot-resource, env, boot, rootfs, appfs, UDISK); partition table read from the first 4 MiB of the decompressed stream. Hash computed on the archive as published.
